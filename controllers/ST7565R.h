@@ -41,7 +41,10 @@
 #ifndef ST7565R_H_
 #define ST7565R_H_
 
-/* Commands */
+/** 
+ * \name Commands for ST7565R controller
+ * @{
+ */
 #define ST7565R_DISPLAY_ON               0xAF /* 0b10101111 */
 #define ST7565R_DISPLAY_OFF              0xAE /* 0b10101110 */
 #define ST7565R_PAGE_ADDRESS_SET         0xB0 /* 0b10110000 */
@@ -49,10 +52,14 @@
 #define ST7565R_COLUMN_ADDRESS_SET_UPPER 0x10 
 #define ST7565R_DISPLAY_NORMAL           0xA4 /* 0b10100100 */
 #define ST7565R_DISPLAY_ALL_ON           0xA5 /* 0b10100101 */
+#define ST7565R_DISPLAY_POSITIVE         0xA6 /* 0b10100110 */
+#define ST7565R_DISPLAY_NEGATIVE         0xA7 /* 0b10100111 */
 #define ST7565R_NORMAL                   0xA0 /* 0b10100000 */
 #define ST7565R_REVERSE                  0xA1 /* 0b10100001 */
 #define ST7565R_RESET                    0xE2 /* 0b11100010 */
 #define ST7565R_SET_START_LINE           (1<<6)
+
+/**@}*/
 
 /* These functions only available on ST7565 implementation (for now) */
 
@@ -65,6 +72,12 @@ void glcd_all_on(void);
 
 /** Set to normal mode */
 void glcd_normal(void);
+
+/** Set to positive mode display */
+void glcd_display_positive(void);
+
+/** Set to negative mode display */
+void glcd_display_negative(void);
 
 /** Set start line/page */
 void glcd_set_start_line(uint8_t addr);

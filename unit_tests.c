@@ -68,7 +68,7 @@ void glcd_test_circles(void)
 {
 	uint8_t x,y,radius;
 
-	while (1) {
+	while(1) {
 		uint8_t i;
 		
 		glcd_clear();
@@ -309,7 +309,7 @@ void glcd_test_bitmap_128x64(void)
 {
 	glcd_draw_bitmap(bmp_oslogo);
 	glcd_write();	
-	while (1) {
+	while(1) {
 		DEMO_RETURN();
 	}
 }

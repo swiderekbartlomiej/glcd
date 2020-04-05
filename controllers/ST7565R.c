@@ -8,16 +8,26 @@
 
 #include "../glcd.h"
 
-void glcd_command(uint8_t c)
-{
+void glcd_command(uint8_t command) {
 	GLCD_A0_LOW();
-	glcd_spi_write(c);	
+	#if defined(GLCD_USE_SPI)
+		glcd_spi_write(command);
+	#elif defined(GLCD_USE_PARALLEL)
+		glcd_parallel_write(command);
+	#else
+		#error "Not defined GLCD interface (SPI/PARALLEL)! Add definition for compiler - GLCD_USE_SPI or GLCD_USE_PARALLEL"
+	#endif
 }
 
-void glcd_data(uint8_t c)
-{
+void glcd_data(uint8_t data) {
 	GLCD_A0_HIGH();
-	glcd_spi_write(c);	
+	#if defined(GLCD_USE_SPI)
+		glcd_spi_write(data);
+	#elif defined(GLCD_USE_PARALLEL)
+		glcd_parallel_write(data);
+	#else
+		#error "Not defined GLCD interface (SPI/PARALLEL)! Add definition for compiler - GLCD_USE_SPI or GLCD_USE_PARALLEL"
+	#endif
 }
 
 void glcd_set_contrast(uint8_t val) {
@@ -35,8 +45,7 @@ void glcd_set_contrast(uint8_t val) {
 	return;
 }
 
-void glcd_power_down(void)
-{
+void glcd_power_down(void) {
 	/* Command sequence as in ST7565 datasheet */
 	glcd_command(0xac);	// Static indicator off
 	glcd_command(0x00);	// Static indicator register, not blinking
@@ -46,8 +55,7 @@ void glcd_power_down(void)
 	/* Display is now in sleep mode */
 }
 
-void glcd_power_up(void)
-{
+void glcd_power_up(void) {
 	glcd_command(0xa4); // Display all points OFF
 	glcd_command(0xad);	// Static indicator ON
 	glcd_command(0x00);	// Static indicator register, not Blinking
@@ -56,45 +64,37 @@ void glcd_power_up(void)
 	return;
 }
 
-void glcd_set_y_address(uint8_t y)
-{
+void glcd_set_y_address(uint8_t y) {
 	glcd_command(ST7565R_PAGE_ADDRESS_SET | (0x0F & y)); /* 0x0F = 0b00001111 */
 }
 
-void glcd_set_x_address(uint8_t x)
-{
+void glcd_set_x_address(uint8_t x) {
 	glcd_set_column_upper(x);
 	glcd_set_column_lower(x);	
 }
 
-void glcd_all_on(void)
-{
+void glcd_all_on(void) {
 	glcd_command(ST7565R_DISPLAY_ALL_ON);
 }
 
-void glcd_normal(void)
-{
+void glcd_normal(void) {
 	glcd_command(ST7565R_DISPLAY_NORMAL);
 }
 
-void glcd_set_column_upper(uint8_t addr)
-{
+void glcd_set_column_upper(uint8_t addr) {
 	glcd_command(ST7565R_COLUMN_ADDRESS_SET_UPPER | (addr >> 4));
 }
 
-void glcd_set_column_lower(uint8_t addr)
-{
+void glcd_set_column_lower(uint8_t addr) {
 	glcd_command(ST7565R_COLUMN_ADDRESS_SET_LOWER | (0x0f & addr));
 }
 
-void glcd_set_start_line(uint8_t addr)
-{
+void glcd_set_start_line(uint8_t addr) {
 	glcd_command( ST7565R_SET_START_LINE | (0x3F & addr)); /* 0x3F == 0b00111111 */
 }
 
 /** Clear the display immediately, does not buffer */
-void glcd_clear_now(void)
-{
+void glcd_clear_now(void) {
 	uint8_t page;
 	for (page = 0; page < GLCD_NUMBER_OF_BANKS; page++) {
 		uint8_t col;
@@ -106,8 +106,7 @@ void glcd_clear_now(void)
 	}
 }
 
-void glcd_pattern(void)
-{
+void glcd_pattern(void) {
 	uint8_t page;
 	for (page = 0; page < GLCD_NUMBER_OF_BANKS; page++) {
 		uint8_t col;
@@ -119,8 +118,7 @@ void glcd_pattern(void)
 	}
 }
 
-void glcd_write()
-{
+void glcd_write() {
 
 	uint8_t bank;
 
@@ -139,8 +137,7 @@ void glcd_write()
 		glcd_set_y_address(bank);
 		glcd_set_x_address(glcd_bbox_selected->x_min);
 
-		for (column = glcd_bbox_selected->x_min; column <= glcd_bbox_selected->x_max; column++)
-		{
+		for (column = glcd_bbox_selected->x_min; column <= glcd_bbox_selected->x_max; column++) {
 			glcd_data( glcd_buffer_selected[GLCD_NUMBER_OF_COLS * bank + column] );
 		}
 	}
